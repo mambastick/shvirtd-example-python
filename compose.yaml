@@ -1,0 +1,53 @@
+name: shvirtd-example
+
+include:
+  - proxy.yaml
+
+services:
+  db:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    env_file:
+      - .env
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      # ждём, пока сервер реально поднимется и начнёт отвечать
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    # Ниже строки для задания 2, но я его не сделал, но для ознакомления оставлю тут. 
+    # Если используем образ из Yandex Cloud, закомментируйте build и раскомментируйте image:
+    # image: cr.yandex/<registry>/<namespace>/shvirtd-example-python:py312
+    container_name: web
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # Добавляем только те переменные, которых нет .env
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      TABLE_NAME: requests
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
+
+volumes:
+  mysql_data:
