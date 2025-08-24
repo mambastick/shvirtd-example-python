@@ -1,0 +1,35 @@
+# VCS / IDE
+.git
+.gitignore
+.github
+.idea
+.vscode
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Envs / cache
+.venv/
+env/
+venv/
+.cache/
+dist/
+build/
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Misc
+*.log
+.DS_Store
